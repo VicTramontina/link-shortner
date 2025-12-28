@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+/* Custom gradient background */
+.bg-gradient-custom {
+  background: linear-gradient(135deg, #667eea 0%, #5BC0EB 50%, #4A90E2 100%);
+}
+
+.bg-gradient-main {
+  background: linear-gradient(135deg, #4A90E2 0%, #5BC0EB 50%, #667eea 100%);
+}
+
+/* Decorative elements */
+.decorative-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.decorative-x {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 24px;
+  font-weight: bold;
+}
+
+/* Custom colors */
+@theme {
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #4A90E2;
+  --color-primary-600: #3b7cc9;
+  --color-primary-700: #2d68b0;
+  --color-primary-800: #1e5497;
+  --color-primary-900: #0f407e;
+
+  --color-secondary-50: #ecfeff;
+  --color-secondary-100: #cffafe;
+  --color-secondary-200: #a5f3fc;
+  --color-secondary-300: #67e8f9;
+  --color-secondary-400: #22d3ee;
+  --color-secondary-500: #5BC0EB;
+  --color-secondary-600: #4ab3de;
+  --color-secondary-700: #39a6d1;
+  --color-secondary-800: #2899c4;
+  --color-secondary-900: #178cb7;
+}
