@@ -1,14 +1,20 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import LinkForm from '../../src/components/LinkForm.vue'
+import BaseButton from '../../src/components/BaseButton.vue'
 
 describe('LinkForm', () => {
+  const mountOptions = {
+    global: {
+      stubs: { teleport: true },
+      components: { BaseButton }
+    }
+  }
+
   it('renders when show is true', () => {
     const wrapper = mount(LinkForm, {
       props: { show: true, link: null },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
     expect(wrapper.find('form').exists()).toBe(true)
   })
@@ -16,34 +22,28 @@ describe('LinkForm', () => {
   it('does not render when show is false', () => {
     const wrapper = mount(LinkForm, {
       props: { show: false, link: null },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
     expect(wrapper.find('form').exists()).toBe(false)
   })
 
-  it('shows "Create New Link" title when creating new link', () => {
+  it('shows "Criar Novo Link" title when creating new link', () => {
     const wrapper = mount(LinkForm, {
       props: { show: true, link: null },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
-    expect(wrapper.text()).toContain('Create New Link')
+    expect(wrapper.text()).toContain('Criar Novo Link')
   })
 
-  it('shows "Edit Link" title when editing existing link', () => {
+  it('shows "Editar Link" title when editing existing link', () => {
     const wrapper = mount(LinkForm, {
       props: {
         show: true,
         link: { id: 1, original_url: 'https://example.com', slug: 'abc123', title: 'Test' }
       },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
-    expect(wrapper.text()).toContain('Edit Link')
+    expect(wrapper.text()).toContain('Editar Link')
   })
 
   it('populates form with link data when editing', async () => {
@@ -55,16 +55,14 @@ describe('LinkForm', () => {
     }
     const wrapper = mount(LinkForm, {
       props: { show: true, link },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
 
     await wrapper.vm.$nextTick()
 
     const urlInput = wrapper.find('input[type="url"]')
-    const slugInput = wrapper.find('input[placeholder="my-custom-url"]')
-    const titleInput = wrapper.find('input[placeholder="My Link Title"]')
+    const slugInput = wrapper.find('input[placeholder="meu-link"]')
+    const titleInput = wrapper.find('input[placeholder="Título do meu link"]')
 
     expect(urlInput.element.value).toBe('https://example.com')
     expect(slugInput.element.value).toBe('abc123')
@@ -74,20 +72,19 @@ describe('LinkForm', () => {
   it('emits close event when cancel button is clicked', async () => {
     const wrapper = mount(LinkForm, {
       props: { show: true, link: null },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
-    await wrapper.find('button[type="button"]').trigger('click')
+    // Find the secondary variant button (cancel button)
+    const buttons = wrapper.findAll('button')
+    const cancelButton = buttons.find(b => b.classes().includes('border-gray-300'))
+    await cancelButton.trigger('click')
     expect(wrapper.emitted('close')).toBeTruthy()
   })
 
   it('emits close event when backdrop is clicked', async () => {
     const wrapper = mount(LinkForm, {
       props: { show: true, link: null },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
     await wrapper.find('.bg-black\\/50').trigger('click')
     expect(wrapper.emitted('close')).toBeTruthy()
@@ -96,14 +93,12 @@ describe('LinkForm', () => {
   it('emits submit event with form data when form is submitted', async () => {
     const wrapper = mount(LinkForm, {
       props: { show: true, link: null },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
 
     const urlInput = wrapper.find('input[type="url"]')
-    const slugInput = wrapper.find('input[placeholder="my-custom-url"]')
-    const titleInput = wrapper.find('input[placeholder="My Link Title"]')
+    const slugInput = wrapper.find('input[placeholder="meu-link"]')
+    const titleInput = wrapper.find('input[placeholder="Título do meu link"]')
 
     await urlInput.setValue('https://example.com')
     await slugInput.setValue('myslug')
@@ -122,28 +117,24 @@ describe('LinkForm', () => {
     })
   })
 
-  it('shows Create button text for new link', () => {
+  it('shows Criar button text for new link', () => {
     const wrapper = mount(LinkForm, {
       props: { show: true, link: null },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
     const submitButton = wrapper.find('button[type="submit"]')
-    expect(submitButton.text()).toBe('Create')
+    expect(submitButton.text()).toBe('Criar')
   })
 
-  it('shows Update button text for existing link', () => {
+  it('shows Atualizar button text for existing link', () => {
     const wrapper = mount(LinkForm, {
       props: {
         show: true,
         link: { id: 1, original_url: 'https://example.com', slug: 'abc', title: '' }
       },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
     const submitButton = wrapper.find('button[type="submit"]')
-    expect(submitButton.text()).toBe('Update')
+    expect(submitButton.text()).toBe('Atualizar')
   })
 })

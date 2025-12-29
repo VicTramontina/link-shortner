@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ConfirmDialog from '../../src/components/ConfirmDialog.vue'
+import BaseButton from '../../src/components/BaseButton.vue'
 
 describe('ConfirmDialog', () => {
   const defaultProps = {
@@ -9,12 +10,17 @@ describe('ConfirmDialog', () => {
     message: 'Test message',
   }
 
+  const mountOptions = {
+    global: {
+      stubs: { teleport: true },
+      components: { BaseButton }
+    }
+  }
+
   it('renders when show is true', () => {
     const wrapper = mount(ConfirmDialog, {
       props: defaultProps,
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
     expect(wrapper.text()).toContain('Test Title')
     expect(wrapper.text()).toContain('Test message')
@@ -23,9 +29,7 @@ describe('ConfirmDialog', () => {
   it('does not render when show is false', () => {
     const wrapper = mount(ConfirmDialog, {
       props: { ...defaultProps, show: false },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
     expect(wrapper.find('.fixed').exists()).toBe(false)
   })
@@ -33,59 +37,54 @@ describe('ConfirmDialog', () => {
   it('renders default button texts', () => {
     const wrapper = mount(ConfirmDialog, {
       props: defaultProps,
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
-    expect(wrapper.text()).toContain('Cancel')
-    expect(wrapper.text()).toContain('Confirm')
+    expect(wrapper.text()).toContain('Cancelar')
+    expect(wrapper.text()).toContain('Confirmar')
   })
 
   it('renders custom button texts', () => {
     const wrapper = mount(ConfirmDialog, {
       props: {
         ...defaultProps,
-        confirmText: 'Delete',
-        cancelText: 'Go Back',
+        confirmText: 'Excluir',
+        cancelText: 'Voltar',
       },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
-    expect(wrapper.text()).toContain('Delete')
-    expect(wrapper.text()).toContain('Go Back')
+    expect(wrapper.text()).toContain('Excluir')
+    expect(wrapper.text()).toContain('Voltar')
   })
 
   it('emits confirm event when confirm button is clicked', async () => {
     const wrapper = mount(ConfirmDialog, {
       props: defaultProps,
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
+    // Find buttons with primary variant (confirm buttons)
     const buttons = wrapper.findAll('button')
-    await buttons[1].trigger('click') // Second button is confirm
+    // The confirm buttons have bg-primary-500 class
+    const confirmButton = buttons.find(b => b.classes().includes('bg-primary-500'))
+    await confirmButton.trigger('click')
     expect(wrapper.emitted('confirm')).toBeTruthy()
   })
 
   it('emits cancel event when cancel button is clicked', async () => {
     const wrapper = mount(ConfirmDialog, {
       props: defaultProps,
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
+    // Find buttons with secondary variant (cancel buttons)
     const buttons = wrapper.findAll('button')
-    await buttons[0].trigger('click') // First button is cancel
+    const cancelButton = buttons.find(b => b.classes().includes('border-gray-300'))
+    await cancelButton.trigger('click')
     expect(wrapper.emitted('cancel')).toBeTruthy()
   })
 
   it('emits cancel event when backdrop is clicked', async () => {
     const wrapper = mount(ConfirmDialog, {
       props: defaultProps,
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
     await wrapper.find('.bg-black\\/50').trigger('click')
     expect(wrapper.emitted('cancel')).toBeTruthy()
@@ -94,22 +93,20 @@ describe('ConfirmDialog', () => {
   it('applies danger styling when danger prop is true', () => {
     const wrapper = mount(ConfirmDialog, {
       props: { ...defaultProps, danger: true },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
-    const confirmButton = wrapper.findAll('button')[1]
-    expect(confirmButton.classes()).toContain('bg-red-500')
+    const buttons = wrapper.findAll('button')
+    const dangerButton = buttons.find(b => b.classes().includes('bg-red-500'))
+    expect(dangerButton).toBeTruthy()
   })
 
   it('applies primary styling when danger prop is false', () => {
     const wrapper = mount(ConfirmDialog, {
       props: { ...defaultProps, danger: false },
-      global: {
-        stubs: { teleport: true }
-      }
+      ...mountOptions
     })
-    const confirmButton = wrapper.findAll('button')[1]
-    expect(confirmButton.classes()).toContain('bg-primary-500')
+    const buttons = wrapper.findAll('button')
+    const primaryButton = buttons.find(b => b.classes().includes('bg-primary-500'))
+    expect(primaryButton).toBeTruthy()
   })
 })

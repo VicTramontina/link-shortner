@@ -19,13 +19,13 @@ describe('LinkItem', () => {
     expect(wrapper.text()).toContain('Test Link')
   })
 
-  it('renders "Untitled Link" when title is empty', () => {
+  it('renders "Link sem título" when title is empty', () => {
     const wrapper = mount(LinkItem, {
       props: {
         link: { ...mockLink, title: null }
       }
     })
-    expect(wrapper.text()).toContain('Untitled Link')
+    expect(wrapper.text()).toContain('Link sem título')
   })
 
   it('renders short URL', () => {
@@ -46,7 +46,7 @@ describe('LinkItem', () => {
     const wrapper = mount(LinkItem, {
       props: { link: mockLink }
     })
-    await wrapper.find('[title="Edit"]').trigger('click')
+    await wrapper.find('[title="Editar"]').trigger('click')
     expect(wrapper.emitted('edit')).toBeTruthy()
     expect(wrapper.emitted('edit')[0]).toEqual([mockLink])
   })
@@ -55,7 +55,7 @@ describe('LinkItem', () => {
     const wrapper = mount(LinkItem, {
       props: { link: mockLink }
     })
-    await wrapper.find('[title="Delete"]').trigger('click')
+    await wrapper.find('[title="Excluir"]').trigger('click')
     expect(wrapper.emitted('delete')).toBeTruthy()
     expect(wrapper.emitted('delete')[0]).toEqual([mockLink])
   })
@@ -64,16 +64,16 @@ describe('LinkItem', () => {
     const wrapper = mount(LinkItem, {
       props: { link: mockLink, showRestore: true }
     })
-    expect(wrapper.find('[title="Restore"]').exists()).toBe(true)
-    expect(wrapper.find('[title="Delete permanently"]').exists()).toBe(true)
-    expect(wrapper.find('[title="Edit"]').exists()).toBe(false)
+    expect(wrapper.find('[title="Restaurar"]').exists()).toBe(true)
+    expect(wrapper.find('[title="Excluir permanentemente"]').exists()).toBe(true)
+    expect(wrapper.find('[title="Editar"]').exists()).toBe(false)
   })
 
   it('emits restore event when restore button is clicked', async () => {
     const wrapper = mount(LinkItem, {
       props: { link: mockLink, showRestore: true }
     })
-    await wrapper.find('[title="Restore"]').trigger('click')
+    await wrapper.find('[title="Restaurar"]').trigger('click')
     expect(wrapper.emitted('restore')).toBeTruthy()
     expect(wrapper.emitted('restore')[0]).toEqual([mockLink])
   })
@@ -82,7 +82,7 @@ describe('LinkItem', () => {
     const wrapper = mount(LinkItem, {
       props: { link: mockLink, showRestore: true }
     })
-    await wrapper.find('[title="Delete permanently"]').trigger('click')
+    await wrapper.find('[title="Excluir permanentemente"]').trigger('click')
     expect(wrapper.emitted('forceDelete')).toBeTruthy()
     expect(wrapper.emitted('forceDelete')[0]).toEqual([mockLink])
   })
@@ -99,7 +99,7 @@ describe('LinkItem', () => {
       props: { link: mockLink }
     })
 
-    await wrapper.find('[title="Copy URL"]').trigger('click')
+    await wrapper.find('[title="Copiar URL"]').trigger('click')
     expect(writeTextMock).toHaveBeenCalledWith(mockLink.short_url)
     expect(wrapper.emitted('copy')).toBeTruthy()
   })
