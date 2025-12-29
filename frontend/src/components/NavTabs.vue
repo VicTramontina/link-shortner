@@ -68,9 +68,8 @@ const isActive = (path) => {
           <IconChart v-else-if="tab.icon === 'chart'" class="w-5 h-5" />
           <IconTrash v-else-if="tab.icon === 'trash'" class="w-5 h-5" />
 
-          <!-- Texto animado - hidden on very small screens -->
           <span
-            class="font-medium overflow-hidden whitespace-nowrap transition-all duration-300 text-sm sm:text-base hidden xs:inline"
+            class="font-medium overflow-hidden whitespace-nowrap transition-all duration-300 text-sm sm:text-base hidden xs:inline sm:inline"
             :class="isActive(tab.path) ? 'max-w-[100px] opacity-100' : 'max-w-0 opacity-0'"
           >
             {{ tab.label }}
