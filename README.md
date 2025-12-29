@@ -95,7 +95,7 @@ npm run dev
 - **Frontend**: http://localhost:5173
 - **API**: http://localhost:8000/api
 - **Swagger Docs**: http://localhost:8000/api/documentation
-- **phpMyAdmin**: http://localhost:8080|
+- **phpMyAdmin**: http://localhost:8080
 
 ## Testes
 
