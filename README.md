@@ -32,7 +32,9 @@ link-shortner/
 │   │   └── router/            # Vue Router
 │   └── tests/                 # Testes Vitest
 ├── docker/                  # Configuracoes Docker
-│   └── nginx/                 # Nginx config
+│   ├── cron/                  # Crontab para Laravel Scheduler
+│   ├── nginx/                 # Nginx config
+│   └── php/                   # Scripts PHP (start.sh)
 └── docker-compose.yml       # Orquestracao dos containers
 ```
 
@@ -41,7 +43,7 @@ link-shortner/
 ### 1. Clonar o repositorio
 
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/VicTramontina/link-shortner.git
 cd link-shortner
 ```
 
@@ -54,25 +56,25 @@ cp backend/.env.example backend/.env
 ### 3. Subir os containers
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 4. Instalar dependencias do Laravel
 
 ```bash
-docker-compose exec app composer install
+docker compose exec app composer install
 ```
 
 ### 5. Gerar chave da aplicacao
 
 ```bash
-docker-compose exec app php artisan key:generate
+docker compose exec app php artisan key:generate
 ```
 
 ### 6. Executar migracoes
 
 ```bash
-docker-compose exec app php artisan migrate
+docker compose exec app php artisan migrate
 ```
 
 ### 7. Instalar dependencias do frontend
@@ -93,51 +95,14 @@ npm run dev
 - **Frontend**: http://localhost:5173
 - **API**: http://localhost:8000/api
 - **Swagger Docs**: http://localhost:8000/api/documentation
-- **phpMyAdmin**: http://localhost:8080
-
-## Endpoints da API
-
-### Autenticacao
-
-| Metodo | Rota | Descricao |
-|--------|------|-----------|
-| POST | `/api/register` | Criar conta |
-| POST | `/api/login` | Login (retorna token) |
-| POST | `/api/logout` | Logout (invalida token) |
-| GET | `/api/user` | Dados do usuario logado |
-
-### Links (autenticados)
-
-| Metodo | Rota | Descricao |
-|--------|------|-----------|
-| GET | `/api/links` | Listar links (paginacao, busca, ordenacao) |
-| POST | `/api/links` | Criar novo link |
-| GET | `/api/links/{id}` | Obter link especifico |
-| PUT | `/api/links/{id}` | Atualizar link |
-| DELETE | `/api/links/{id}` | Soft delete (move para lixeira) |
-| GET | `/api/links/trash` | Listar links na lixeira |
-| POST | `/api/links/{id}/restore` | Restaurar da lixeira |
-| DELETE | `/api/links/{id}/force` | Deletar permanentemente |
-
-### Estatisticas (autenticados)
-
-| Metodo | Rota | Descricao |
-|--------|------|-----------|
-| GET | `/api/stats` | Estatisticas resumidas |
-| GET | `/api/stats/detailed` | Estatisticas detalhadas |
-
-### Redirecionamento (publico)
-
-| Metodo | Rota | Descricao |
-|--------|------|-----------|
-| GET | `/{slug}` | Redirecionar para URL original |
+- **phpMyAdmin**: http://localhost:8080|
 
 ## Testes
 
 ### Backend (PHPUnit)
 
 ```bash
-docker-compose exec app php artisan test
+docker compose exec app php artisan test
 ```
 
 ### Frontend (Vitest)
@@ -152,24 +117,45 @@ npm test
 - **Autenticacao**: Registro, login e logout com Laravel Sanctum
 - **CRUD de Links**: Criar, editar e deletar links encurtados
 - **Slugs**: Personalizados (6-8 caracteres) ou auto-gerados
-- **Soft Delete**: Links vao para lixeira antes de exclusao permanente
-- **Estatisticas**: Contagem de acessos, views e CTR
+- **Soft Delete**: Links vao para lixeira antes de exclusão permanente
+- **Estatísticas**: Contagem de acessos, views e CTR
 - **Logs de Acesso**: IP, User-Agent e timestamp de cada acesso
 - **Reset Mensal**: Comando Cron para resetar contadores no dia 1
 
-## Cron Job (Reset Mensal)
+## Laravel Scheduler
 
-Para configurar o reset automatico dos contadores:
+O scheduler do Laravel inicia automaticamente com `docker compose up`. O cron executa `php artisan schedule:run` a cada minuto dentro do container `app`.
 
-```bash
-# Adicionar ao crontab do servidor
-0 0 1 * * docker-compose exec app php artisan links:reset-access-count
+### Configurar Agendamentos
+
+Edite `backend/routes/console.php` para adicionar ou modificar tarefas agendadas:
+
+```php
+use Illuminate\Support\Facades\Schedule;
+
+// Reset mensal dos contadores (dia 1, meia-noite)
+Schedule::command('links:reset-access-count')->monthlyOn(1, '00:00');
 ```
 
-Ou usar o scheduler do Laravel:
+### Logs
+
+Os logs ficam em `backend/storage/logs/laravel-YYYY-MM-DD.log` com rotacao automatica (14 dias).
 
 ```bash
-docker-compose exec app php artisan schedule:work
+# Ver logs em tempo real
+tail -f backend/storage/logs/laravel-*.log
+```
+
+## Swagger (API Docs)
+
+A documentacao da API usa L5-Swagger com annotations `@OA\` nos Controllers.
+
+**Acessar:** http://localhost:8000/api/documentation
+
+### Gerar documentacao
+
+```bash
+docker compose exec app php artisan l5-swagger:generate
 ```
 
 ## Tecnologias
@@ -198,10 +184,5 @@ docker-compose exec app php artisan schedule:work
 ## Design Patterns
 
 - **Service Pattern**: `SlugGeneratorService` para logica de geracao de slugs
-- **Form Request**: Validacao centralizada em classes dedicadas
-- **API Resource**: Formatacao de respostas JSON
+- **Form Request**: Validacao centralizada em classes dedicadas- **API Resource**: Formatacao de respostas JSON
 - **Factory Pattern**: Geracao de dados para testes
-
-## Licenca
-
-MIT
